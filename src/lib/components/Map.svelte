@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { Deck, type Layer } from '@deck.gl/core';
 	import { TileLayer } from '@deck.gl/geo-layers';
+	import { BitmapLayer } from '@deck.gl/layers';
 	import { browser } from '$app/environment';
-	// import { Map as MapLibreMap } from 'maplibre-gl'; // Uncomment if using MapLibre for base map & controls
+	import { Globe, SatelliteDish } from '@lucide/svelte';
+	// import { Map as MapLibreMap } from 'maplibre-gl';
 
 	// Props
 	type ViewState = {
@@ -48,31 +50,82 @@
 		new TileLayer({
 			id: 'osm-street-layer',
 			data: osmTileUrl,
-			minZoom: 0,
-			maxZoom: 19,
+			visible: currentMapStyle === 'street', // Restore visibility logic
 			tileSize: 256,
-			visible: currentMapStyle === 'street',
+			maxCacheSize: 400, // Increase tile cache
+			renderSubLayers: props => {
+				const { tile } = props;
+				if (tile && tile.boundingBox &&
+					Array.isArray(tile.boundingBox) && tile.boundingBox.length === 2 &&
+					Array.isArray(tile.boundingBox[0]) && tile.boundingBox[0].length >= 2 &&
+					Array.isArray(tile.boundingBox[1]) && tile.boundingBox[1].length >= 2) {
+
+					const minCoords = tile.boundingBox[0];
+					const maxCoords = tile.boundingBox[1];
+					
+					const west = minCoords[0];
+					const south = minCoords[1];
+					const east = maxCoords[0];
+					const north = maxCoords[1];
+						
+					return new BitmapLayer(props, {
+						data: undefined,
+						image: props.data,
+						bounds: [west, south, east, north]
+					});
+				}
+				console.warn('OSM Tile or tile.boundingBox structure is invalid:', JSON.stringify(tile));
+				return null;
+			}
 		}),
-		new TileLayer({
+		new TileLayer({ // Restore satellite layer
 			id: 'mapbox-satellite-layer',
 			data: mapboxSatelliteTileUrl,
 			minZoom: 0,
 			maxZoom: 22,
 			tileSize: 256,
+			maxCacheSize: 400, // Increase tile cache
 			visible: currentMapStyle === 'satellite',
-			// Consider Mapbox attribution requirements
+			renderSubLayers: props => {
+				const { tile } = props;
+				if (tile && tile.boundingBox &&
+					Array.isArray(tile.boundingBox) && tile.boundingBox.length === 2 &&
+					Array.isArray(tile.boundingBox[0]) && tile.boundingBox[0].length >= 2 &&
+					Array.isArray(tile.boundingBox[1]) && tile.boundingBox[1].length >= 2) {
+
+					const minCoords = tile.boundingBox[0];
+					const maxCoords = tile.boundingBox[1];
+					
+					const west = minCoords[0];
+					const south = minCoords[1];
+					const east = maxCoords[0];
+					const north = maxCoords[1];
+						
+					return new BitmapLayer(props, {
+						data: undefined,
+						image: props.data,
+						bounds: [west, south, east, north]
+					});
+				}
+				console.warn('Mapbox Tile or tile.boundingBox structure is invalid:', JSON.stringify(tile));
+				return null;
+			}
 		}),
 	]);
 
 	$effect(() => {
 		// canvasContainer is the div, actualCanvasElement is the <canvas> inside it
 		if (browser && actualCanvasElement) {
+			console.log('Map.svelte: $effect for Deck initialization entered. actualCanvasElement is available.');
+			
 			deckInstance = new Deck({
-				canvas: actualCanvasElement, // Pass the actual canvas element
-				initialViewState: currentViewState,
+				canvas: actualCanvasElement,
+				initialViewState: initialViewState, // Use the initialViewState prop for the Deck constructor
 				controller: controller,
-				layers: layers, // Initial layers
+				layers: [], // Pass empty layers array for now
 				onViewStateChange: ({ viewState: newViewStateParams }) => {
+					// Update our Svelte state when Deck's internal view state changes
+					// This does NOT feed back into this effect's dependencies for Deck re-creation
 					currentViewState = {
 						longitude: newViewStateParams.longitude,
 						latitude: newViewStateParams.latitude,
@@ -82,7 +135,7 @@
 					};
 				},
 				onLoad: () => {
-					console.log('Deck.gl Map component initialized');
+					console.log('Deck.gl Map component initialized with NO layers, using prop initialViewState.');
 				},
 			});
 
@@ -91,45 +144,58 @@
 				deckInstance = null;
 				console.log('Deck.gl Map component finalized');
 			};
+			
+		} else {
+			console.log('Map.svelte: $effect for Deck initialization skipped (browser:', browser, 'actualCanvasElement:', !!actualCanvasElement, ')');
 		}
 	});
 
 	// Reactive updates to layers
 	$effect(() => {
 		if (deckInstance) {
+			console.log('Map.svelte: $effect for layer updates RUNNING setProps with layers:', layers);
 			deckInstance.setProps({ layers });
+		} else {
+			console.log('Map.svelte: $effect for layer updates SKIPPED (no deckInstance). Layers value:', layers);
 		}
 	});
 
-	// If initialViewState prop changes externally after mount, update Deck
+	// The $effect block below was causing the 'state_proxy_equality_mismatch' warning
+	// and its logic for reacting to initialViewState prop changes post-mount was not fully robust.
+	// For now, view state is initialized, and then updated via user interaction & onViewStateChange.
+	// If programmatic "flyTo" based on prop changes is needed later, a more specific effect
+	// focusing on changes to the `initialViewState` prop itself would be required,
+	// likely calling `deckInstance.setProps({ viewState: newInitialPropValue })`.
+	/*
 	$effect(() => {
 		if (deckInstance && initialViewState !== currentViewState) {
-			// This effect might be too simplistic for "flying" to a new initialViewState.
-			// Typically, you'd update `currentViewState` which Deck uses.
-			// If `initialViewState` is meant to be a "reset" or "goto" point,
-			// you might directly set `currentViewState = initialViewState;` here,
-			// or use `deckInstance.setProps({ viewState: initialViewState })` if you want Deck to animate.
-			// For now, let's assume Deck's internal state + onViewStateChange is primary.
+			// console.log('initialViewState prop may have changed externally.');
 		}
 	});
-
+	*/
 
 	function toggleMapStyle() {
 		currentMapStyle = currentMapStyle === 'street' ? 'satellite' : 'street';
+		console.log("Map style switched to:", currentMapStyle);
 	}
 </script>
 
 <!-- This outer div is now just for layout and applying the style prop -->
-<div {style} class="map-container relative"> {/* Ensure relative positioning for the absolute toggle button */}
+<div {style} class="map-container relative">
 	<!-- Deck.gl will render its canvas into this explicit canvas element -->
 	<canvas bind:this={actualCanvasElement} style="width: 100%; height: 100%; display: block;"></canvas>
 </div>
 
-<div class="map-style-toggle absolute top-2 right-2 z-10">
+<div class="map-style-toggle absolute bottom-6 left-6 z-10">
 	<button
-		class="bg-background/80 text-foreground hover:bg-muted focus:ring-ring rounded-md px-3 py-1 text-sm shadow-md backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+		class="bg-background/80 text-foreground hover:bg-muted focus:ring-ring flex px-4 py-2 items-center justify-between gap-3 rounded-full p-2 shadow-md backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
 		onclick={toggleMapStyle}
+		title={currentMapStyle === 'street' ? 'Switch to Satellite View' : 'Switch to Street View'}
 	>
-		Switch to {currentMapStyle === 'street' ? 'Satellite' : 'Street'}
+		{#if currentMapStyle === 'street'}
+			<SatelliteDish class="h-5 w-5" /> Satellite
+		{:else}
+			<Globe class="h-5 w-5" /> Map
+		{/if}
 	</button>
 </div>

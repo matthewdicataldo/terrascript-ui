@@ -19,26 +19,15 @@
 <Sidebar.Provider side="right">
 	<Sidebar.Inset>
 		<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-			<Breadcrumb.Root>
-				<Breadcrumb.List>
-					<Breadcrumb.Item class="hidden md:block">
-						<Breadcrumb.Link href="#">Building Your Application</Breadcrumb.Link>
-					</Breadcrumb.Item>
-					<Breadcrumb.Separator class="hidden md:block" />
-					<Breadcrumb.Item>
-						<Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
-					</Breadcrumb.Item>
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
+			
+			<div class="gap-4">			
+				<h1 class="text-3xl">Terrascript <span class="text-sm text-stone-400">Talk to your maps</span></h1>
+			</div>
 			<Sidebar.Trigger class="-mr-1 ml-auto rotate-180" />
 		</header>
-		<div class="flex flex-1 flex-col gap-4 p-4">
-			<div class="grid auto-rows-min gap-4 md:grid-cols-3">
-				<div class="bg-muted/50 aspect-video rounded-xl"></div>
-				<div class="bg-muted/50 aspect-video rounded-xl"></div>
-				<div class="bg-muted/50 aspect-video rounded-xl"></div>
-			</div>
-			<!-- 2. Replace the placeholder div with the Map component -->
+		<div class="flex flex-1 flex-col p-4">
+			<!-- The placeholder grid that was here has been removed. -->
+			<!-- The div below now becomes the sole direct child and will take all available space due to flex-1. -->
 			<div class="flex-1 rounded-xl overflow-hidden bg-muted/10">
 				{#if mapboxApiKey}
 					<Map {mapboxApiKey} initialViewState={pageInitialViewState} />
