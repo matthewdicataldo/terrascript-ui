@@ -9,7 +9,8 @@ import type { Server as HttpsServer } from 'https';
 import { db } from './db';
 import { messagesTable, type InsertMessage } from './db/schema';
 import { eq, asc } from 'drizzle-orm';
-import { GEMINI_API_KEY } from '$env/static/private';
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 if (!GEMINI_API_KEY) {
   console.error('❌ GEMINI_API_KEY is not set – aborting WebSocket server bootstrap.');
