@@ -29,7 +29,7 @@ pnpm install
 2.2. Install Dependencies
 We'll use pnpm add for dependencies.
 Server-side:
-@google/generative-ai: For Gemini API.
+@google/genai: For Gemini API.
 orpc: For type-safe RPC.
 ws: WebSocket library (for dev server / Node.js targets).
 dotenv: For environment variables.
@@ -45,7 +45,7 @@ drizzle-kit: For generating Drizzle migrations.
 SvelteKit:
 @sveltejs/adapter-auto: SvelteKit adapter.
 # Production Dependencies
-pnpm add @google/generative-ai orpc ws dotenv drizzle-orm @neondatabase/serverless websocket-ts uuid dexie
+pnpm add @google/gen-ai orpc ws dotenv drizzle-orm @neondatabase/serverless websocket-ts uuid dexie
 
 # Development Dependencies
 pnpm add -D drizzle-kit @types/ws @types/uuid

@@ -11,7 +11,10 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint ."
+		"lint": "prettier --check . && eslint .",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
@@ -23,8 +26,11 @@
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
 		"@tailwindcss/vite": "^4.0.0",
+		"@types/uuid": "^10.0.0",
+		"@types/ws": "^8.18.1",
 		"bits-ui": "^1.5.0",
 		"clsx": "^2.1.1",
+		"drizzle-kit": "^0.31.1",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.0.0",
@@ -53,9 +59,19 @@
 		"@deck.gl/core": "^9.1.12",
 		"@deck.gl/geo-layers": "^9.1.12",
 		"@deck.gl/layers": "^9.1.12",
+		"@google/genai": "^0.15.0",
+		"@neondatabase/serverless": "^1.0.0",
+		"arktype": "^2.1.20",
 		"deck.gl": "^9.1.12",
+		"dexie": "^4.0.11",
+		"dotenv": "^16.5.0",
+		"drizzle-orm": "^0.43.1",
 		"lucide-svelte": "^0.511.0",
 		"maplibre-gl": "^5.5.0",
-		"mode-watcher": "0.5.1"
+		"mode-watcher": "0.5.1",
+		"orpc": "^0.1.1",
+		"uuid": "^11.1.0",
+		"websocket-ts": "^2.2.1",
+		"ws": "^8.18.2"
 	}
 }
