@@ -61,6 +61,8 @@
 		"@deck.gl/layers": "^9.1.12",
 		"@google/genai": "^0.15.0",
 		"@neondatabase/serverless": "^1.0.0",
+		"@orpc/client": "^1.2.0",
+		"@orpc/server": "^1.2.0",
 		"arktype": "^2.1.20",
 		"deck.gl": "^9.1.12",
 		"dexie": "^4.0.11",
@@ -69,9 +71,7 @@
 		"lucide-svelte": "^0.511.0",
 		"maplibre-gl": "^5.5.0",
 		"mode-watcher": "0.5.1",
-		"orpc": "^0.1.1",
 		"uuid": "^11.1.0",
-		"websocket-ts": "^2.2.1",
 		"ws": "^8.18.2"
 	}
 }

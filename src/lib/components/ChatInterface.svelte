@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { type ChatProcedures, type ChatMessage as RpcChatMessage } from '$lib/rpcDefinition'; // chatOrpc removed
   import { createORPCClient } from '@orpc/client'; // Import createORPCClient
-  import { oRPCWebSocketClientAdapter } from 'orpc/client/websocket';
+  import { experimental_RPCLink as WebSocketLink } from '@orpc/client/websocket'; // Updated import
   import { v4 as uuidv4 } from 'uuid';
   import { writable, type Writable } from 'svelte/store';
   import { liveQuery, type Observable } from 'dexie';
@@ -15,8 +15,21 @@
 
   // Observable store for messages from Dexie
   let messages$: Observable<ClientMessage[] | undefined> | undefined;
+let actualMessages: ClientMessage[] | undefined;
+let unsubscribeMsgs: () => void;
 
-  let client: ReturnType<typeof chatOrpc.createClient<ChatProcedures>> | null = null;
+$: {
+  unsubscribeMsgs?.();
+  if (messages$) {
+    const sub = messages$.subscribe(v => (actualMessages = v));
+    unsubscribeMsgs = () => sub.unsubscribe();
+  } else {
+    actualMessages = undefined;
+  }
+}
+onDestroy(() => unsubscribeMsgs?.());
+
+  let client: ChatProcedures | null = null; // Use ChatProcedures interface for client type
   let nativeWs: WebSocket | null = null;
 
   function mapRpcToClientMessage(rpcMsg: RpcChatMessage, convId: string, internalId?: string): Omit<ClientMessage, 'id' | 'timestamp'> {
@@ -74,8 +87,8 @@
     nativeWs.onopen = async () => {
       console.log('Native WebSocket connected');
       connectionStatus.set('Connected');
-      const wsAdapter = oRPCWebSocketClientAdapter(nativeWs!);
-      client = createORPCClient<ChatProcedures>(wsAdapter); // Use createORPCClient directly
+      const wsLink = new WebSocketLink({ websocket: nativeWs! }); // Create WebSocketLink
+      client = createORPCClient(wsLink) as unknown as ChatProcedures; // Force cast
       await loadHistoryFromRpcAndStoreInDexie($conversationId);
     };
 
@@ -159,29 +172,28 @@
     Status: {$connectionStatus} | Conv ID: {$conversationId ? $conversationId.substring(0,8) : 'N/A'}...
   </div>
   <div class="messages-area flex-grow overflow-y-auto mb-2 space-y-2">
-    {#if messages$}
-      {#await messages$}
-        <p class="text-muted-foreground text-sm">Loading messages...</p>
-      {:then resolvedMessages}
-        {#if resolvedMessages && resolvedMessages.length > 0}
-          {#each resolvedMessages as message (message.internalId)}
-            <div class="message p-2 rounded-md text-sm {message.role === 'user' ? 'bg-primary text-primary-foreground ml-auto' : 'bg-muted mr-auto'} {message.status === 'error' ? 'border-destructive border' : ''}"
-                 style="max-width: 80%; word-wrap: break-word;"
-            >
-              <strong class="font-semibold block capitalize">{message.role}</strong>
-              <div class="whitespace-pre-wrap">{@html message.text.replace(/\n/g, '<br>')}</div>
-              {#if message.status === 'pending'}<span class="text-xs text-muted-foreground/70"> (Sending...)</span>{/if}
-              {#if message.status === 'error' && message.role !== 'system'}<span class="text-xs text-destructive/80"> (Failed)</span>{/if}
-            </div>
-          {/each}
-        {:else}
-          <p class="text-muted-foreground text-sm text-center">No messages yet. Send one to start!</p>
-        {/if}
-      {:catch error}
-        <p class="text-destructive text-sm text-center">Error loading messages: {error.message}</p>
-      {/await}
+    {#if $conversationId && messages$ === undefined}
+      <!-- messages$ is not yet initialized but we have a conversationId -->
+      <p class="text-muted-foreground text-sm text-center">Initializing message stream...</p>
+    {:else if $conversationId && actualMessages === undefined && messages$ !== undefined}
+      <!-- messages$ is initialized (liveQuery is running) but actualMessages hasn't received a value yet -->
+      <p class="text-muted-foreground text-sm">Loading messages...</p>
+    {:else if actualMessages && actualMessages.length > 0}
+      {#each actualMessages as message (message.internalId)}
+        <div class="message p-2 rounded-md text-sm {message.role === 'user' ? 'bg-primary text-primary-foreground ml-auto' : 'bg-muted mr-auto'} {message.status === 'error' ? 'border-destructive border' : ''}"
+             style="max-width: 80%; word-wrap: break-word;"
+        >
+          <strong class="font-semibold block capitalize">{message.role}</strong>
+          <div class="whitespace-pre-wrap">{@html message.text.replace(/\n/g, '<br>')}</div>
+          {#if message.status === 'pending'}<span class="text-xs text-muted-foreground/70"> (Sending...)</span>{/if}
+          {#if message.status === 'error' && message.role !== 'system'}<span class="text-xs text-destructive/80"> (Failed)</span>{/if}
+        </div>
+      {/each}
+    {:else if !$conversationId}
+      <p class="text-muted-foreground text-sm text-center">No conversation selected.</p>
     {:else}
-       <p class="text-muted-foreground text-sm text-center">Initializing conversation...</p>
+      <!-- actualMessages is an empty array or messages$ is undefined without a conversationId -->
+      <p class="text-muted-foreground text-sm text-center">No messages yet. Send one to start!</p>
     {/if}
   </div>
   <div class="input-area flex gap-2">
@@ -202,26 +214,3 @@
     </button>
   </div>
 </div>
-
-<style>
-  /* Minimal styles, assuming Tailwind or global styles handle most things */
-  .chat-interface-container {
-    /* background-color: #f9f9f9; */ /* Example, if not handled by parent */
-  }
-  .messages-area {
-    /* Add scrollbar styling if desired */
-  }
-  .message.user {
-    /* Tailwind classes handle this: ml-auto bg-primary text-primary-foreground */
-  }
-  .message.model {
-     /* Tailwind classes handle this: mr-auto bg-muted */
-  }
-  .message.system {
-    text-align: center;
-    font-style: italic;
-    color: hsl(var(--muted-foreground));
-    background-color: hsl(var(--accent));
-    max-width: 100%;
-  }
-</style>
