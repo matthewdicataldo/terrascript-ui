@@ -49,6 +49,11 @@
 		]
 	},
 	"dependencies": {
+		"@deck.gl/core": "^9.1.12",
+		"@deck.gl/geo-layers": "^9.1.12",
+		"@deck.gl/layers": "^9.1.12",
+		"deck.gl": "^9.1.12",
+		"maplibre-gl": "^5.5.0",
 		"mode-watcher": "0.5.1"
 	}
 }
