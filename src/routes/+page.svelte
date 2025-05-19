@@ -4,7 +4,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 </script>
 
-<Sidebar.Provider>
+<Sidebar.Provider side="right">
 	<Sidebar.Inset>
 		<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 			<Breadcrumb.Root>

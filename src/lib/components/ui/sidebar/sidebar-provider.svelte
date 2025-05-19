@@ -8,12 +8,14 @@
 		SIDEBAR_WIDTH,
 		SIDEBAR_WIDTH_ICON,
 	} from "./constants.js";
-	import { setSidebar } from "./context.svelte.js";
+	import { setSidebar, type SidebarStateProps } from "./context.svelte.js";
 
 	let {
 		ref = $bindable(null),
 		open = $bindable(true),
 		onOpenChange = () => {},
+		initialWidth,
+		side = "left",
 		class: className,
 		style,
 		children,
@@ -21,6 +23,8 @@
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		open?: boolean;
 		onOpenChange?: (open: boolean) => void;
+		initialWidth?: string;
+		side?: SidebarStateProps["side"];
 	} = $props();
 
 	const sidebar = setSidebar({
@@ -32,6 +36,12 @@
 			// This sets the cookie to keep the sidebar state.
 			document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
 		},
+		initialWidth,
+		side,
+	});
+
+	$effect(() => {
+		console.log("SidebarProvider $effect, sidebar.width directly:", sidebar.width);
 	});
 </script>
 
@@ -40,7 +50,7 @@
 <Tooltip.Provider delayDuration={0}>
 	<div
 		data-slot="sidebar-wrapper"
-		style="--sidebar-width: {SIDEBAR_WIDTH}; --sidebar-width-icon: {SIDEBAR_WIDTH_ICON}; {style}"
+		style="--sidebar-width: {sidebar.width}; --sidebar-width-icon: {SIDEBAR_WIDTH_ICON}; {style ?? ''}"
 		class={cn(
 			"group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full",
 			className
