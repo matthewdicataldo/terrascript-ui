@@ -71,6 +71,8 @@
 		"lucide-svelte": "^0.511.0",
 		"maplibre-gl": "^5.5.0",
 		"mode-watcher": "0.5.1",
+		"socket.io": "^4.8.1",
+		"socket.io-client": "^4.8.1",
 		"uuid": "^11.1.0",
 		"ws": "^8.18.2"
 	}
