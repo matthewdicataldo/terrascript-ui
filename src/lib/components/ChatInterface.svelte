@@ -32,12 +32,13 @@ onDestroy(() => unsubscribeMsgs?.());
   let client: ChatProcedures | null = null; // Use ChatProcedures interface for client type
   let nativeWs: WebSocket | null = null;
 
-  function mapRpcToClientMessage(rpcMsg: RpcChatMessage, convId: string, internalId?: string): Omit<ClientMessage, 'id' | 'timestamp'> {
+  function mapRpcToClientMessage(rpcMsg: RpcChatMessage, convId: string, messageTimestamp: Date, internalId?: string): Omit<ClientMessage, 'id'> {
     return {
       internalId: internalId || uuidv4(),
       conversationId: convId,
       role: rpcMsg.role,
       text: rpcMsg.parts[0]?.text || '',
+      timestamp: messageTimestamp, // Use provided timestamp
     };
   }
 
@@ -46,19 +47,22 @@ onDestroy(() => unsubscribeMsgs?.());
     connectionStatus.set('Loading history...');
     try {
       const historyResult = await client.getHistory(convId);
-      const clientMessagesToStore: ClientMessage[] = historyResult.map(rpcMsg => ({
-        ...mapRpcToClientMessage(rpcMsg, convId),
-        timestamp: new Date(),
+      const baseTimestamp = Date.now(); // Get a base timestamp
+      const clientMessagesToStore: ClientMessage[] = historyResult.map((rpcMsg, index) => ({
+        ...mapRpcToClientMessage(rpcMsg, convId, new Date(baseTimestamp + index)), // Pass unique timestamp
         status: 'sent'
+        // timestamp: new Date(), // Removed, now handled in mapRpcToClientMessage
       }));
-      await dxDb.messages.bulkPut(clientMessagesToStore);
+      // Clear existing messages for this conversation before adding new ones to prevent ConstraintError
+      await dxDb.messages.where('conversationId').equals(convId).delete(); // Added delete operation
+      await dxDb.messages.bulkAdd(clientMessagesToStore); // Changed bulkPut to bulkAdd
       connectionStatus.set('Connected (History Loaded)');
     } catch (e) {
       console.error("Failed to load history from RPC:", e);
       connectionStatus.set('Error loading history');
     }
   }
-  
+
   $: if ($conversationId) {
       messages$ = liveQuery(
         () => dxDb.messages.where('conversationId').equals($conversationId).sortBy('timestamp')
@@ -79,8 +83,9 @@ onDestroy(() => unsubscribeMsgs?.());
     }
 
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${wsProtocol}//${window.location.host}/api/chat_orpc`;
-    
+    // Connect to the WebSocket server on port 5174
+    const wsUrl = `${wsProtocol}//localhost:5174/api/chat_orpc`; // Modified line
+
     connectionStatus.set('Connecting...');
     nativeWs = new WebSocket(wsUrl);
 
@@ -197,17 +202,17 @@ onDestroy(() => unsubscribeMsgs?.());
     {/if}
   </div>
   <div class="input-area flex gap-2">
-    <input 
-      type="text" 
-      bind:value={$currentInput} 
-      placeholder="Type your message..." 
-      class="flex-grow input input-bordered input-sm" 
+    <input
+      type="text"
+      bind:value={$currentInput}
+      placeholder="Type your message..."
+      class="flex-grow input input-bordered input-sm"
       on:keypress={(e) => e.key === 'Enter' && sendMessage()}
       disabled={!client || ($connectionStatus !== 'Connected' && $connectionStatus !== 'Connected (History Loaded)') || !$conversationId}
     />
-    <button 
-      class="btn btn-primary btn-sm" 
-      on:click={sendMessage} 
+    <button
+      class="btn btn-primary btn-sm"
+      on:click={sendMessage}
       disabled={!client || !$currentInput.trim() || ($connectionStatus !== 'Connected' && $connectionStatus !== 'Connected (History Loaded)') || !$conversationId}
     >
       Send

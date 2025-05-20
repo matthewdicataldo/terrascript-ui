@@ -45,6 +45,32 @@
 	const osmTileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 	const mapboxSatelliteTileUrl = $derived(`https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.png?access_token=${mapboxApiKey}`);
 
+	// Helper function for rendering sub-layers
+	function createBitmapRenderSubLayer(props: any, layerName: string) {
+		const { tile } = props;
+		if (tile && tile.boundingBox &&
+			Array.isArray(tile.boundingBox) && tile.boundingBox.length === 2 &&
+			Array.isArray(tile.boundingBox[0]) && tile.boundingBox[0].length >= 2 &&
+			Array.isArray(tile.boundingBox[1]) && tile.boundingBox[1].length >= 2) {
+
+			const minCoords = tile.boundingBox[0];
+			const maxCoords = tile.boundingBox[1];
+			
+			const west = minCoords[0];
+			const south = minCoords[1];
+			const east = maxCoords[0];
+			const north = maxCoords[1];
+				
+			return new BitmapLayer(props, {
+				data: undefined,
+				image: props.data,
+				bounds: [west, south, east, north]
+			});
+		}
+		console.warn(`${layerName} Tile or tile.boundingBox structure is invalid:`, JSON.stringify(tile));
+		return null;
+	}
+
 	// Derived layers based on currentMapStyle
 	let layers = $derived([
 		new TileLayer({
@@ -53,30 +79,7 @@
 			visible: currentMapStyle === 'street', // Restore visibility logic
 			tileSize: 256,
 			maxCacheSize: 400, // Increase tile cache
-			renderSubLayers: props => {
-				const { tile } = props;
-				if (tile && tile.boundingBox &&
-					Array.isArray(tile.boundingBox) && tile.boundingBox.length === 2 &&
-					Array.isArray(tile.boundingBox[0]) && tile.boundingBox[0].length >= 2 &&
-					Array.isArray(tile.boundingBox[1]) && tile.boundingBox[1].length >= 2) {
-
-					const minCoords = tile.boundingBox[0];
-					const maxCoords = tile.boundingBox[1];
-					
-					const west = minCoords[0];
-					const south = minCoords[1];
-					const east = maxCoords[0];
-					const north = maxCoords[1];
-						
-					return new BitmapLayer(props, {
-						data: undefined,
-						image: props.data,
-						bounds: [west, south, east, north]
-					});
-				}
-				console.warn('OSM Tile or tile.boundingBox structure is invalid:', JSON.stringify(tile));
-				return null;
-			}
+			renderSubLayers: props => createBitmapRenderSubLayer(props, 'OSM')
 		}),
 		new TileLayer({ // Restore satellite layer
 			id: 'mapbox-satellite-layer',
@@ -86,30 +89,7 @@
 			tileSize: 256,
 			maxCacheSize: 400, // Increase tile cache
 			visible: currentMapStyle === 'satellite',
-			renderSubLayers: props => {
-				const { tile } = props;
-				if (tile && tile.boundingBox &&
-					Array.isArray(tile.boundingBox) && tile.boundingBox.length === 2 &&
-					Array.isArray(tile.boundingBox[0]) && tile.boundingBox[0].length >= 2 &&
-					Array.isArray(tile.boundingBox[1]) && tile.boundingBox[1].length >= 2) {
-
-					const minCoords = tile.boundingBox[0];
-					const maxCoords = tile.boundingBox[1];
-					
-					const west = minCoords[0];
-					const south = minCoords[1];
-					const east = maxCoords[0];
-					const north = maxCoords[1];
-						
-					return new BitmapLayer(props, {
-						data: undefined,
-						image: props.data,
-						bounds: [west, south, east, north]
-					});
-				}
-				console.warn('Mapbox Tile or tile.boundingBox structure is invalid:', JSON.stringify(tile));
-				return null;
-			}
+			renderSubLayers: props => createBitmapRenderSubLayer(props, 'Mapbox')
 		}),
 	]);
 

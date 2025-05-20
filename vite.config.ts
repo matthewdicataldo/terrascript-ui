@@ -1,23 +1,17 @@
 import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig, type PluginOption } from 'vite';
-import { createWebSocketServer } from './src/lib/server/webSocketHandler'; // Restore import
-import type { Server } from 'http';
+import { defineConfig } from 'vite'; // Removed type PluginOption
 
-// Vite plugin for WebSocket server setup
-const webSocketPlugin: PluginOption = {
-	name: 'webSocketServer',
-	configureServer(server) {
-		if (server.httpServer) {
-			createWebSocketServer(server.httpServer as Server); // Cast to Server
-		} else {
-			console.warn('HTTP server not available at configureServer hook. WebSocket server for dev might not start.');
-		}
-	}
-};
+// Removed import of createWebSocketServer and Server
+// Removed webSocketPlugin definition
 
 export default defineConfig({
-	plugins: [tailwindcss(), sveltekit(), webSocketPlugin], // Restore webSocketPlugin
+	plugins: [tailwindcss(), sveltekit()], // Removed webSocketPlugin
+	server: {
+		hmr: {
+			port: 0 // Let the system choose a free port for HMR
+		}
+	},
 	ssr: {
 		// noExternal: ['@orpc/client'] // Comment out to make it external for SSR
 	},

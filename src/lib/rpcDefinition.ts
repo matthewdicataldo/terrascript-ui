@@ -8,7 +8,7 @@ export interface ChatMessage { // This represents the structure used in communic
 }
 
 export interface ChatProcedures {
-  chatStream: (params: { conversationId: string; message: string }) => AsyncGenerator<{ type: 'chunk' | 'error' | 'end'; data: string | ChatMessage[] }>;
+  chatStream: (params: { conversationId: string; message: string }) => AsyncGenerator<{ type: 'chunk' | 'error' | 'end'; data: string }>;
   getHistory: (conversationId: string) => Promise<ChatMessage[]>; // Returns an array of Gemini-compatible history messages
 }
 
