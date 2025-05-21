@@ -1,6 +1,6 @@
 // src/lib/server/webSocketHandler.ts
 import { Server as SocketIOServer } from 'socket.io';
-import type { ChatMessage } from '../rpcDefinition'; // Keep for ChatMessage type
+import type { ChatMessage } from '../chatIntefaces'; // Keep for ChatMessage type
 import { GoogleGenAI as genai } from '@google/genai';
 import { db } from './db';
 import { messagesTable, type InsertMessage } from './db/schema';
@@ -142,7 +142,7 @@ export function initWebSocketServer() {
         // We still emit streamEnd in the finally block
         // Consider if a separate error type is needed for errors outside the stream
         if (!accumulatedModelResponse) { // Only emit a general error if no chunks were sent
-             socket.emit('streamError', { conversationId, type: 'error', data: `General Error: ${error instanceof Error ? error.message : String(error)}` });
+          socket.emit('streamError', { conversationId, type: 'error', data: `General Error: ${error instanceof Error ? error.message : String(error)}` });
         }
       } finally {
         // Always emit streamEnd from the outer finally to ensure it's sent
