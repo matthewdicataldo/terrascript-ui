@@ -1,6 +1,6 @@
 // src/lib/server/webSocketHandler.ts
 import { Server as SocketIOServer } from 'socket.io';
-import type { ChatMessage } from '../chatIntefaces'; // Keep for ChatMessage type
+import type { ChatMessage } from '../chatInterfaces'; // Keep for ChatMessage type
 import { GoogleGenAI as genai } from '@google/genai';
 import { db } from './db';
 import { messagesTable, type InsertMessage } from './db/schema';
