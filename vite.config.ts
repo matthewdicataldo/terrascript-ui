@@ -11,13 +11,5 @@ export default defineConfig({
 		hmr: {
 			port: 0 // Let the system choose a free port for HMR
 		}
-	},
-	ssr: {
-		// noExternal: ['@orpc/client'] // Comment out to make it external for SSR
-	},
-	build: {
-		rollupOptions: {
-			// external: ['@orpc/client'] // Comment out for now
-		}
 	}
 });

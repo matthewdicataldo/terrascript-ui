@@ -23,12 +23,6 @@ importers:
       '@neondatabase/serverless':
         specifier: ^1.0.0
         version: 1.0.0
-      '@orpc/client':
-        specifier: ^1.2.0
-        version: 1.2.0
-      '@orpc/server':
-        specifier: ^1.2.0
-        version: 1.2.0(ws@8.18.2)
       arktype:
         specifier: ^2.1.20
         version: 2.1.20
@@ -908,38 +902,6 @@ packages:
   '@open-wc/dedupe-mixin@1.4.0':
     resolution: {integrity: sha512-Sj7gKl1TLcDbF7B6KUhtvr+1UCxdhMbNY5KxdU5IfMFWqL8oy1ZeAcCANjoB1TL0AJTcPmcCFsCbHf8X2jGDUA==}
 
-  '@orpc/client@1.2.0':
-    resolution: {integrity: sha512-Wt1il08fs6l9YK8TIjLmMBwb7MzzO8+3aOxFMs7RaQE3iGQ9Ox7ImomSPV8lhxQpWefpDN9fqOCH6pOid6cH6Q==}
-
-  '@orpc/contract@1.2.0':
-    resolution: {integrity: sha512-hl90EmPYtP4oMK2+93yocgDaah95tXi3YQbmdgQuKCec4x4GAn85LbHze4G8pPZ5BiSjNSBpyykRV4uA4E5zbA==}
-
-  '@orpc/server@1.2.0':
-    resolution: {integrity: sha512-EQARc4PEcS3ndkL+Es87M1BZru5x7q49q7Ivcd6tWFpA9Hn6n08WgiJDqDRDMoEeEJlzG5AzI+eXxvF1hR9Cdg==}
-    peerDependencies:
-      crossws: '>=0.3.4'
-      ws: '>=8.18.1'
-    peerDependenciesMeta:
-      crossws:
-        optional: true
-      ws:
-        optional: true
-
-  '@orpc/shared@1.2.0':
-    resolution: {integrity: sha512-Y01Q4dS/vlxWfV4cEAmMSWaitbIqp6yFXgin/rIEtciwXr5X1YRw80+dtu91eLWAmEaOCOL/BcyACinqEvc/DQ==}
-
-  '@orpc/standard-server-fetch@1.2.0':
-    resolution: {integrity: sha512-2gNOSkmgoWD1L3LWr5/47C8PibsMnFr4GCU7VXKtyFo0ejsP51hxgwnetFwDeKfDWugEtjNzk19xsvN09Vj4Ug==}
-
-  '@orpc/standard-server-node@1.2.0':
-    resolution: {integrity: sha512-ZRUAZKxQWwzJuHWUsskK5+E+V1mx21eJtGihJRnk5VZWiK8ooA/0g4Kvf8v5ewfyahFLjDsRPEJJV2UZLUlVtg==}
-
-  '@orpc/standard-server-peer@1.2.0':
-    resolution: {integrity: sha512-G6shbGltkxpYVeQiJEOAQnlCyxKGzMi5vzL3+EMggCqm6ykt3UIR3+QEcey1x7OKXopienjh6Rq+i7IwVBI+ZA==}
-
-  '@orpc/standard-server@1.2.0':
-    resolution: {integrity: sha512-EJ9GqNwK6gGfcdoQGgAJsVZ2c4HFcvkq8TJOUDdv6DFl/GmViIU2log0o4K83C5B9vNIYRahk26hOOFp9sdQAQ==}
-
   '@parse5/tools@0.3.0':
     resolution: {integrity: sha512-zxRyTHkqb7WQMV8kTNBKWb1BeOFUKXBXTBWuxg9H9hfvQB3IwP6Iw2U75Ia5eyRxPNltmY7E8YAlz6zWwUnjKg==}
 
@@ -1060,9 +1022,6 @@ packages:
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
-
-  '@standard-schema/spec@1.0.0':
-    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
   '@sveltejs/acorn-typescript@1.0.5':
     resolution: {integrity: sha512-IwQk4yfwLdibDlrXVE04jTZYlLnwsTT2PIOQQGNLWfjavGifnk1JD1LcZjZaBTRcxZu2FfPfNLOE04DSu9lqtQ==}
@@ -2880,10 +2839,6 @@ packages:
   quickselect@3.0.0:
     resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
 
-  radash@12.1.0:
-    resolution: {integrity: sha512-b0Zcf09AhqKS83btmUeYBS8tFK7XL2e3RvLmZcm0sTdF1/UUlHSsjXdCcWNxe7yfmAlPve5ym0DmKGtTzP6kVQ==}
-    engines: {node: '>=14.18.0'}
-
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
@@ -4217,55 +4172,6 @@ snapshots:
 
   '@open-wc/dedupe-mixin@1.4.0': {}
 
-  '@orpc/client@1.2.0':
-    dependencies:
-      '@orpc/shared': 1.2.0
-      '@orpc/standard-server': 1.2.0
-      '@orpc/standard-server-fetch': 1.2.0
-      '@orpc/standard-server-peer': 1.2.0
-
-  '@orpc/contract@1.2.0':
-    dependencies:
-      '@orpc/client': 1.2.0
-      '@orpc/shared': 1.2.0
-      '@standard-schema/spec': 1.0.0
-
-  '@orpc/server@1.2.0(ws@8.18.2)':
-    dependencies:
-      '@orpc/client': 1.2.0
-      '@orpc/contract': 1.2.0
-      '@orpc/shared': 1.2.0
-      '@orpc/standard-server': 1.2.0
-      '@orpc/standard-server-fetch': 1.2.0
-      '@orpc/standard-server-node': 1.2.0
-      '@orpc/standard-server-peer': 1.2.0
-    optionalDependencies:
-      ws: 8.18.2
-
-  '@orpc/shared@1.2.0':
-    dependencies:
-      radash: 12.1.0
-      type-fest: 4.41.0
-
-  '@orpc/standard-server-fetch@1.2.0':
-    dependencies:
-      '@orpc/shared': 1.2.0
-      '@orpc/standard-server': 1.2.0
-
-  '@orpc/standard-server-node@1.2.0':
-    dependencies:
-      '@orpc/shared': 1.2.0
-      '@orpc/standard-server': 1.2.0
-
-  '@orpc/standard-server-peer@1.2.0':
-    dependencies:
-      '@orpc/shared': 1.2.0
-      '@orpc/standard-server': 1.2.0
-
-  '@orpc/standard-server@1.2.0':
-    dependencies:
-      '@orpc/shared': 1.2.0
-
   '@parse5/tools@0.3.0':
     dependencies:
       parse5: 7.3.0
@@ -4345,8 +4251,6 @@ snapshots:
     optional: true
 
   '@socket.io/component-emitter@3.1.2': {}
-
-  '@standard-schema/spec@1.0.0': {}
 
   '@sveltejs/acorn-typescript@1.0.5(acorn@8.14.1)':
     dependencies:
@@ -6204,8 +6108,6 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   quickselect@3.0.0: {}
-
-  radash@12.1.0: {}
 
   range-parser@1.2.1: {}
 
